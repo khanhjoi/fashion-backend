@@ -18,6 +18,7 @@ app.use(fileUpload({
 
 // Routes
 app.use('/user', require('../server/routes/userRouter'));
+app.use('/api', require('../server/routes/categoryRouter'));
 
 
 // connect to mongodb 
