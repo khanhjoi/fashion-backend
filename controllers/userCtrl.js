@@ -1,7 +1,7 @@
 const Users = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+// password 1231331
 const userCtrl = {
     register: async (req, res) => {
         try {
@@ -37,11 +37,47 @@ const userCtrl = {
             });
 
             res.json({accessToken});
-            // res.json({msg: "Register Success"});
         } catch (err) {
             return res.status(500).json({msg: err.message});
         }
-    }, 
+    },
+    login: async (req, res) => {
+        try{
+            const {email, password} = req.body;
+            
+            const user = await Users.findOne({email});    
+            if(!user) {
+                return res.status(400).json({msg: "User is not exist."})
+            }
+
+            const isMatch = await bcrypt.compare(password, user.password);
+            if(!isMatch) {
+                return res.status(400).json({msg: "Incorrect Password."})
+            }
+
+            // if Login success, create access_token and refresh_token
+                //  then create jsonwebtoken to authentication
+             const accessToken = createAccessToken({id: user._id});
+             const refreshToken = createRefreshToken({id: user._id});
+ 
+                // store token to cookie 
+             res.cookie('refreshToken', refreshToken, {
+                 httpOnly: true,
+                 path: '/user/refresh_token'
+             });
+            res.json({accessToken});
+        }catch (err){
+            return res.status(500).json({msg: err.message});
+        }
+    },
+    logout: async (req, res) => {
+        try {
+            res.clearCookie('refreshToken', {path: '/user/refresh_token'});
+            return res.json({msg: 'logout success.'});
+        }catch (err){
+            return res.status(500).json({msg: err.message});
+        }
+    },
     refreshToken: (req, res) => {
         try {
             const rf_token = req.cookies.refreshToken;
@@ -58,6 +94,15 @@ const userCtrl = {
                 // check user
                 res.json({ accessToken });
             });
+        } catch (err) {
+            return res.status(500).json({msg: err.message});
+        }
+    },
+    getUser: async (req, res) => {
+        try{
+            const user = await Users.findById(req.user.id).select('-password');
+            if(!user) return res.status(400).json({msg: 'User not found'});
+            res.json(user);
         } catch (err) {
             return res.status(500).json({msg: err.message});
         }
