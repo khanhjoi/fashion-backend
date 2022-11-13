@@ -13,12 +13,13 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
 app.use(fileUpload({
-    useTempFile: true
+    useTempFiles: true,
 }))
 
 // Routes
 app.use('/user', require('../server/routes/userRouter'));
 app.use('/api', require('../server/routes/categoryRouter'));
+app.use('/api', require('../server/routes/uploadRouter'));
 
 
 // connect to mongodb 

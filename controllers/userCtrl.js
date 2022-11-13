@@ -7,7 +7,7 @@ const userCtrl = {
         try {
             const {name, email, password} = req.body;
             const user = await Users.findOne({email});
-        
+            
             // logic store data
             if(user) {
                 return res.status(400).json({msg: "The email already exits."})
