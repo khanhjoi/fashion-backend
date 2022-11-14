@@ -20,6 +20,7 @@ app.use(fileUpload({
 app.use('/user', require('../server/routes/userRouter'));
 app.use('/api', require('../server/routes/categoryRouter'));
 app.use('/api', require('../server/routes/uploadRouter'));
+app.use('/api', require('../server/routes/productRouter'));
 
 
 // connect to mongodb 
